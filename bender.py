@@ -284,4 +284,13 @@ class Bender:
             self.breaker = not self.breaker
             log('breaker:', self.breaker)
 
+        # Если нашли телепорт
+        elif current_cell == 'T':
+            # Найдем положение другого телепорта
+            other_teleport_pos = [k for k, v in self.objects_map.items() if v == 'T' and k != self.pos][0]
+            log('teleport: {} -> {}'.format(self.pos, other_teleport_pos))
+
+            # Телепортируемся
+            self.pos = other_teleport_pos
+
         return current_cell
