@@ -236,8 +236,8 @@ class Bender:
         log('Current direction:', self.direction_name)
 
         # Приоритеты смены движения при встрече с препятствием:
-        # SOUTH -> EAST -> NORTH -> WEST -> SOUTH
-        # WEST -> NORTH -> EAST -> SOUTH -> WEST
+        # invert=False: SOUTH -> EAST  -> NORTH -> WEST
+        # invert=True:  WEST  -> NORTH -> EAST  -> SOUTH
         priorities = ['SOUTH', 'EAST', 'NORTH', 'WEST']
         if self.invert:
             priorities.reverse()
