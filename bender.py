@@ -132,13 +132,23 @@ def log(*args, **kwargs):
 
 class Bender:
     def __init__(self, city_map):
-        # Определим положение Бендера на карте
+        self.objects_map = dict()
+
+        # Соберем все объекты на карте в словарь, исключаются пустые места и стенки
         for i in range(len(city_map)):
             row = city_map[i]
             for j in range(len(row)):
-                if city_map[i][j] == '@':
-                    self.pos_i, self.pos_j = i, j
+                cell = city_map[i][j]
 
+                if cell == '@':
+                    self.objects_map[cell] = i, j
+
+                    # Под Бендером пустая клетка
+                    self.objects_map[i, j] = ' '
+                else:
+                    self.objects_map[i, j] = cell
+
+        log('Objects map:', self.objects_map)
         log('Bender pos: {}x{}'.format(self.pos_i, self.pos_j))
 
         self.direction_name = 'SOUTH'
@@ -146,12 +156,52 @@ class Bender:
         self.invert = False
         self.breaker = False
 
-        # Пиво должно оставаться после того как его Бендер подберет
-        # поэтому заводим флаг, который вернет пиво, после того как Бендер пройдет на следующую ячейку
-        self.__previous_step_was_beer = False
+        self.rows = len(city_map)
+        self.cols = len(city_map[0])
 
-        self.city_map = city_map
         self.steps = list()
+
+    def _set_pos_i(self, value):
+        # Устанавливаем i, и старое j
+        self.pos = value, self.pos[1]
+
+    def _get_pos_i(self):
+        return self.pos[0]
+
+    pos_i = property(_get_pos_i, _set_pos_i)
+
+    def _set_pos_j(self, value):
+        # Устанавливаем старое i и j
+        self.pos = self.pos[0], value
+
+    def _get_pos_j(self):
+        return self.pos[1]
+
+    pos_j = property(_get_pos_j, _set_pos_j)
+
+    def _set_pos(self, value):
+        self.objects_map['@'] = value
+
+    def _get_pos(self):
+        return self.objects_map['@']
+
+    pos = property(_get_pos, _set_pos)
+
+    def print_city_map(self):
+        # Создаем карту
+        map = list()
+        for i in range(self.rows):
+            row = [self.objects_map[i, j] for j in range(self.cols)]
+            map.append(row)
+
+        # Добавляем Бендера
+        i, j = self.pos
+        map[i][j] = '@'
+
+        log()
+        for row in map:
+            log(*row, sep='')
+        log()
 
     def _set_direction_name(self, name):
         self._direction_name = name
@@ -171,18 +221,16 @@ class Bender:
 
     def look_around(self):
         return {
-            'SOUTH': self.city_map[self.pos_i + 1][self.pos_j],
-            'EAST': self.city_map[self.pos_i][self.pos_j + 1],
-            'NORTH': self.city_map[self.pos_i - 1][self.pos_j],
-            'WEST': self.city_map[self.pos_i][self.pos_j - 1],
+            'SOUTH': self.objects_map[self.pos_i + 1, self.pos_j],
+            'EAST': self.objects_map[self.pos_i, self.pos_j + 1],
+            'NORTH': self.objects_map[self.pos_i - 1, self.pos_j],
+            'WEST': self.objects_map[self.pos_i, self.pos_j - 1],
         }
 
     def step(self):
-        log()
-        for row in self.city_map:
-            log(*row, sep='')
-        log()
+        self.print_city_map()
 
+        log('Objects map:', self.objects_map)
         look_around = self.look_around()
         log("look_around: {} {}x{}".format(look_around, self.pos_i, self.pos_j))
         log('Current direction:', self.direction_name)
@@ -205,28 +253,20 @@ class Bender:
             if next_cell not in ['#', 'X'] or (next_cell == 'X' and self.breaker):
                 break
 
-            # new_direction_name = CHANGE_DIRECTION_DICT[(priorities.pop(0), self.invert)]
             new_direction_name = priorities.pop(0)
             log('look_around change direction: {} -> {}.'.format(self.direction_name, new_direction_name))
             self.direction_name = new_direction_name
 
         di, dj = self.get_direction(self.direction_name)
 
-        if self.__previous_step_was_beer:
-            self.__previous_step_was_beer = False
-
-            # Пиво должно остаться на месте
-            self.city_map[self.pos_i][self.pos_j] = 'B'
-
-        else:
-            self.city_map[self.pos_i][self.pos_j] = ' '
-
         self.pos_i += di
         self.pos_j += dj
-        current_cell = self.city_map[self.pos_i][self.pos_j]
 
-        # Перемещаем Бендера
-        self.city_map[self.pos_i][self.pos_j] = '@'
+        # Ломаем препятствие
+        if next_cell == 'X' and self.breaker:
+            self.objects_map[self.pos] = ' '
+
+        current_cell = self.objects_map[self.pos]
 
         self.steps.append(self.direction_name)
 
@@ -243,7 +283,5 @@ class Bender:
         elif current_cell == 'B':
             self.breaker = not self.breaker
             log('breaker:', self.breaker)
-
-            self.__previous_step_was_beer = True
 
         return current_cell
