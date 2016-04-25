@@ -1,7 +1,7 @@
 import unittest
 
 import bender
-# bender.DEBUG = False
+bender.DEBUG = False
 
 
 class BenderTestCase(unittest.TestCase):
@@ -399,7 +399,6 @@ EAST
 
         self.bender_run(city_map, correct)
 
-    @unittest.skip
     def test_LOOP(self):
         city_map = """
 ###############
@@ -425,7 +424,6 @@ LOOP
 
         self.bender_run(city_map, correct)
 
-    @unittest.skip
     def test_Multiple_Loops(self):
         city_map = """
 ###############
