@@ -320,7 +320,6 @@ EAST
 
         self.bender_run(city_map, correct)
 
-    @unittest.skip
     def test_All_Together(self):
         city_map = """
 ###############
