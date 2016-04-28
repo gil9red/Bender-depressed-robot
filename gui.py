@@ -76,14 +76,21 @@ class MainWindow(QMainWindow):
         self.city_map_editor = QPlainTextEdit()
         self.city_map_editor.setPlainText(
             """\
-########
-# @    #
-#     X#
-# XXX  #
-#   XX #
-#   XX #
-#     $#
-########
+###############
+#      IXXXXX #
+#  @          #
+#E S          #
+#             #
+#  I          #
+#  B          #
+#  B   S     W#
+#  B   T      #
+#             #
+#         T   #
+#         B   #
+#N          W$#
+#        XXXX #
+###############
             """
         )
         dock_map_layout = QVBoxLayout()
@@ -108,6 +115,7 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.RightDockWidgetArea, dock_steps)
 
         self.bender = None
+        self.steps_log_list = list()
 
         self.view = QTableWidget()
         self.view.verticalHeader().hide()
@@ -117,6 +125,8 @@ class MainWindow(QMainWindow):
         self.update_states()
 
     def new_game(self):
+        self.steps_log_list = list()
+
         city_map = [list(row.strip()) for row in self.city_map_editor.toPlainText().strip().split('\n')]
         self.bender = bender.Bender(city_map)
 
@@ -126,6 +136,15 @@ class MainWindow(QMainWindow):
     def next_step(self):
         cell = self.bender.step()
         print('cell: "{}"'.format(cell))
+
+        log = self.bender.direction_name, self.bender.pos, self.bender.invert, self.bender.breaker
+        if log in self.steps_log_list:
+            # QMessageBox.information(self, 'LOOP', 'LOOP')
+            pass
+        self.steps_log_list.append(log)
+
+        text = '\n'.join(['\t'.join(list(map(str, log))) for log in self.steps_log_list])
+        self.steps_log.setPlainText(text)
 
         self.update_view()
 
@@ -139,8 +158,6 @@ class MainWindow(QMainWindow):
         self.next_step_button.setEnabled(self.bender is not None)
 
     def update_view(self):
-        self.steps_log.setPlainText('\n'.join(self.bender.steps))
-
         self.view.clear()
         self.view.setRowCount(self.bender.rows)
         self.view.setColumnCount(self.bender.cols)

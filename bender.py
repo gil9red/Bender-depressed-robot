@@ -160,6 +160,7 @@ class Bender:
         self.cols = len(city_map[0])
 
         self.steps = list()
+        # self.steps_log_list = list()
 
     def _set_pos_i(self, value):
         # Устанавливаем i, и старое j
@@ -271,8 +272,6 @@ class Bender:
 
         current_cell = self.objects_map[self.pos]
 
-        # self.steps.append(self.direction_name)
-
         # TODO: проверка на зацикленность
         # Если по скорости, то дополнительная хэш таблица, в котрой будут храниться все посещенные объекты.
         # Если по памяти, то есть классический алгоритм, когда по списку пускаем 2 указателя, один за шаг переходит на 1 элемент вперед,
@@ -317,6 +316,18 @@ class Bender:
         # 2. Пустить два итератора. Первый по правилу i=i+1, второй по правилу i=i+2. И если второй догонит первый, то у вас есть цикл.
         # 3. Вариант с удалением ссылок на next.
         #
+        #
+        #
+        #
+        # Ведем учет состояния Бендера и если оно повторяется, мы зациклены
+        # step_log = self.direction_name, self.pos, self.invert, self.breaker
+        # if step_log in self.steps_log_list:
+        #     return 'LOOP'
+        #
+        # self.steps_log_list.append(step_log)
+        #
+        #
+
         step = self.direction_name
         self.steps.append(step)
 
