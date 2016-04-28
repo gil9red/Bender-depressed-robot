@@ -4,52 +4,6 @@
 __author__ = 'ipetrash'
 
 
-#     def transform_input(city_map, correct):
-#         city_map = [list(row.strip()) for row in city_map.strip().split('\n')]
-#         correct = [i.strip() for i in correct.strip().split('\n')]
-#
-#         return city_map, correct
-#
-#     def bender_run(self, city_map, correct, max_count=None):
-#         city_map, correct = self.transform_input(city_map, correct)
-#
-#         b = bender.Bender(city_map)
-#
-#         if max_count is None:
-#             max_count = len(correct) + 5
-#
-#         # Ходим, пока не встретим символ '$'
-#         while True:
-#             max_count -= 1
-#             if max_count <= 0:
-#                 break
-#
-#             cell = b.step()
-#             bender.log('cell: "{}"'.format(cell))
-#             if cell == '$':
-#                 break
-#
-#         bender.log(b.steps, correct, sep='\n')
-#         self.assertEqual(b.steps, correct)
-#
-#     def test_Simple_moves(self):
-#         city_map = """
-# #####
-# #@  #
-# #   #
-# #  $#
-# #####
-#         """
-#
-#         correct = """
-# SOUTH
-# SOUTH
-# EAST
-# EAST
-#         """
-#
-
-
 import sys
 
 from PySide.QtGui import *
